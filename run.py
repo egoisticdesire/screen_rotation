@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QApplication, QSystemTrayIcon
 from PyQt6.QtGui import QAction, QActionGroup, QIcon
 
 from utils.utils import set_hotkeys_to_landscape_mode, set_hotkeys_to_portrait_mode
-from utils.variables import ICON_APP, ICON_EXIT, ICON_LANDSCAPE_MODE, ICON_PORTRAIT_MODE, MESSAGE_LANDSCAPE_MODE, MESSAGE_PORTRAIT_MODE, MESSAGE_TITLE, TITLE_APP, TITLE_EXIT, TITLE_LANDSCAPE_MODE, TITLE_PORTRAIT_MODE
+from utils.variables import ICON_APP_LOCK, ICON_APP_UNLOCK, ICON_EXIT, ICON_LANDSCAPE_MODE, ICON_PORTRAIT_MODE, MESSAGE_LANDSCAPE_MODE, MESSAGE_PORTRAIT_MODE, MESSAGE_TITLE, TITLE_APP, TITLE_APP_LOCK, TITLE_EXIT, TITLE_LANDSCAPE_MODE, TITLE_PORTRAIT_MODE
 from widgets.rounded_menu import RoundedCornersQMenu
 
 
@@ -15,7 +15,7 @@ class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.is_locked = False
-        self.app_icon = QIcon(ICON_APP)
+        self.app_icon = QIcon(ICON_APP_UNLOCK)
         self.setIcon(self.app_icon)
         self.setToolTip(TITLE_APP)
 
@@ -50,13 +50,23 @@ class SystemTrayIcon(QSystemTrayIcon):
         if reason == self.ActivationReason.Trigger:
             # Обработка одиночного клика
             if self.is_locked:
-                self.setIcon(QIcon(ICON_APP))
+                self.setIcon(QIcon(ICON_APP_UNLOCK))
                 self.setToolTip(TITLE_APP)
+
+                # Восстановление предыдущего состояния режима экрана
+                self.__update_actions_state()
                 self.is_locked = False
+
             else:
-                self.setIcon(QIcon('assets/round_screen_lock_rotation_white_48dp.png'))
-                self.setToolTip(f'{TITLE_APP} :: LOCKED')
+                self.setIcon(QIcon(ICON_APP_LOCK))
+                self.setToolTip(f'{TITLE_APP}{TITLE_APP_LOCK}')
+
+                # Запрет изменения режима экрана
+                self.landscape_action.setEnabled(False)
+                self.portrait_action.setEnabled(False)
+                keyboard.unhook_all()
                 self.is_locked = True
+
         elif reason == self.ActivationReason.DoubleClick:
             # Обработка двойного клика
             self.__on_orientation_change_callback()
