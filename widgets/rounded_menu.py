@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QMenu
 
 
 class RoundedCornersQMenu(QMenu):
-    def __init__(self, radius=8):
+    def __init__(self, radius=10):
         super().__init__()
         self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint)
         self.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -15,7 +15,7 @@ class RoundedCornersQMenu(QMenu):
                     font-size: 16px;
                     background-color: rgb(26, 26, 26);
                     color: rgb(200, 200, 200);
-                    border: 1px solid rgb(86, 86, 86);
+                    border: 2px solid rgb(86, 86, 86);
                     border-radius: {self._radius}px;
                 }}
                 QMenu::item {{
@@ -46,7 +46,7 @@ class RoundedCornersQMenu(QMenu):
 
     def resizeEvent(self, event):
         path = QtGui.QPainterPath()
-        rect = QtCore.QRectF(self.rect()).adjusted(-.5, -.5, -.01, -.01)
+        rect = QtCore.QRectF(self.rect()).adjusted(.5, .5, -1.1, -1.1)
         path.addRoundedRect(rect, self._radius, self._radius)
         region = QtGui.QRegion(path.toFillPolygon(QtGui.QTransform()).toPolygon())
         self.setMask(region)

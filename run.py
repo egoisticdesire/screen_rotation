@@ -27,45 +27,45 @@ class SystemTrayIcon(QSystemTrayIcon):
         self.orientation_group = QActionGroup(self)
         self.orientation_group.setExclusive(True)
 
-        self.normal_action = self.__create_action(TITLE_LANDSCAPE_MODE, ICON_LANDSCAPE_MODE, self.__on_orientation_change, checkable=True)
-        self.portrait_action = self.__create_action(TITLE_PORTRAIT_MODE, ICON_PORTRAIT_MODE, self.__on_orientation_change, checkable=True)
-        self.quit_action = self.__create_action(TITLE_EXIT, ICON_EXIT, self.__on_exit_callback)
+        self.landscape_action = self.__create_action(TITLE_LANDSCAPE_MODE, ICON_LANDSCAPE_MODE, self.__on_orientation_change_callback, checkable=True)
+        self.portrait_action = self.__create_action(TITLE_PORTRAIT_MODE, ICON_PORTRAIT_MODE, self.__on_orientation_change_callback, checkable=True)
+        self.exit_action = self.__create_action(TITLE_EXIT, ICON_EXIT, self.__on_exit_callback)
 
-        self.orientation_group.addAction(self.normal_action)
+        self.orientation_group.addAction(self.landscape_action)
         self.orientation_group.addAction(self.portrait_action)
 
-        menu_actions = [self.normal_action, self.portrait_action, self.menu.addSeparator(), self.quit_action]
+        menu_actions = [self.landscape_action, self.portrait_action, self.menu.addSeparator(), self.exit_action]
         self.menu.addActions(menu_actions)
 
         self.setContextMenu(self.menu)
 
         self.__update_actions_state()  # Установка начального состояния активности кнопок
 
-    def __create_action(self, text, icon, callback, checkable=False):
+    def __create_action(self, title, icon, callback, checkable=False):
         action = QAction(self)
-        action.setText(text)
+        action.setText(title)
         action.setIcon(QIcon(icon))
         action.setCheckable(checkable)
         action.triggered.connect(callback)
         return action
 
     def __update_actions_state(self):
-        # Проверка текущего режима экрана (0 - landscape, 90 - portrait)
         current_orientation = self.primary_display.current_orientation
 
+        # Проверка текущего режима экрана (0 - landscape, 90 - portrait)
         if current_orientation == 0:
-            self.normal_action.setChecked(True)
-            self.normal_action.setEnabled(False)
+            self.landscape_action.setChecked(True)
+            self.landscape_action.setEnabled(False)
             self.portrait_action.setEnabled(True)
-            set_hotkeys_to_landscape_mode(self.__on_orientation_change)
+            set_hotkeys_to_landscape_mode(self.__on_orientation_change_callback)
 
         elif current_orientation == 90:
             self.portrait_action.setChecked(True)
             self.portrait_action.setEnabled(False)
-            self.normal_action.setEnabled(True)
-            set_hotkeys_to_portrait_mode(self.__on_orientation_change)
+            self.landscape_action.setEnabled(True)
+            set_hotkeys_to_portrait_mode(self.__on_orientation_change_callback)
 
-    def __on_orientation_change(self):
+    def __on_orientation_change_callback(self):
         current_orientation = self.primary_display.current_orientation
 
         if current_orientation == 0:
