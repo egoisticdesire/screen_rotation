@@ -14,6 +14,7 @@ from widgets.rounded_menu import RoundedCornersQMenu
 class SystemTrayIcon(QSystemTrayIcon):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.is_locked = False
         self.app_icon = QIcon(ICON_APP)
         self.setIcon(self.app_icon)
         self.setToolTip(TITLE_APP)
@@ -39,7 +40,26 @@ class SystemTrayIcon(QSystemTrayIcon):
 
         self.setContextMenu(self.menu)
 
-        self.__update_actions_state()  # Установка начального состояния активности кнопок
+        # Установка начального состояния активности кнопок
+        self.__update_actions_state()
+
+        # Подключаем обработчик к событию клика по иконке в трее
+        self.activated.connect(self.__tray_icon_activated)
+
+    def __tray_icon_activated(self, reason):
+        if reason == self.ActivationReason.Trigger:
+            # Обработка одиночного клика
+            if self.is_locked:
+                self.setIcon(QIcon(ICON_APP))
+                self.setToolTip(TITLE_APP)
+                self.is_locked = False
+            else:
+                self.setIcon(QIcon('assets/round_screen_lock_rotation_white_48dp.png'))
+                self.setToolTip(f'{TITLE_APP} :: LOCKED')
+                self.is_locked = True
+        elif reason == self.ActivationReason.DoubleClick:
+            # Обработка двойного клика
+            self.__on_orientation_change_callback()
 
     def __create_action(self, title, icon, callback, checkable=False):
         action = QAction(self)
