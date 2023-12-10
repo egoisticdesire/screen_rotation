@@ -1,0 +1,6 @@
+keyboard==0.13.5
+PyQt6==6.6.1
+PyQt6-Qt6==6.6.1
+PyQt6-sip==13.6.0
+pywin32==306
+rotate-screen==0.1.5
