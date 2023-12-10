@@ -10,9 +10,7 @@
 _Альбомный режим_: `Ctrl + Win + Alt + ArrowUp`\
 _Портретный режим_: `Ctrl + Win + Alt + ArrowDown`\
 \
-_<small>
-Другие варианты подобных приложений, которые удалось найти в Интернете, имели разные недостатки для меня. Это стало поводом написать своё решение.
-</small>_
+_Другие варианты подобных приложений, которые удалось найти в Интернете, имели разные недостатки для меня. Это стало поводом написать своё решение._
 
 ---
 
@@ -24,6 +22,4 @@ _<small>
 _Landscape mode_: `Ctrl + Win + Alt + ArrowUp`\
 _Portrait mode_: `Ctrl + Win + Alt + ArrowDown`\
 \
-_<small>
-Other versions of similar applications that I could find on the Internet had different disadvantages for me. This became the reason to write my decision.
-</small>_
+_Other versions of similar applications that I could find on the Internet had different disadvantages for me. This became the reason to write my decision._
