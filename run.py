@@ -11,7 +11,10 @@ def main():
     tray_icon = SystemTrayIcon()
     tray_icon.show()
 
-    app.exec()
+    try:
+        app.exec()
+    except Exception as e:
+        print(f'[ERROR] {e}')
 
 
 if __name__ == '__main__':

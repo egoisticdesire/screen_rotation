@@ -21,7 +21,6 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.setToolTip(var.TITLES['app'])
 
         self.current_os_theme = get_windows_color_scheme()
-
         self.primary_display = rotatescreen.get_primary_display()
         # self.secondary_displays = rotatescreen.get_secondary_displays()
 
@@ -77,10 +76,19 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
         self.activated.connect(self.__on_tray_icon_activated_callback)
 
-        # Создание таймера для отслеживания изменений темы ОС
+        # Создание таймера для отслеживания изменений
         self.timer_change_theme = QtCore.QTimer(self)
         self.timer_change_theme.timeout.connect(lambda: self.menu.setStyleSheet(self.__check_os_theme()))
+        self.timer_change_theme.timeout.connect(self.__refresh_primary_display_info)
         self.timer_change_theme.start(1000)
+
+    def __refresh_primary_display_info(self):
+        try:
+            self.primary_display = rotatescreen.get_primary_display()
+            # self.secondary_displays = rotatescreen.get_secondary_displays()
+            # Обновите остальные данные или параметры, которые могли измениться
+        except Exception as e:
+            print(f'An error occurred while refreshing primary display info: {e}')
 
     def __check_os_theme(self):
         os_theme = get_windows_color_scheme()
@@ -156,11 +164,11 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
         if orientation == 0:
             self.primary_display.set_portrait()
-            self.showMessage(var.MESSAGES['title'], var.MESSAGES['portrait_mode'], self.app_icon)
+            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['portrait_mode'], self.app_icon)
 
         elif orientation == 90:
             self.primary_display.set_landscape()
-            self.showMessage(var.MESSAGES['title'], var.MESSAGES['landscape_mode'], self.app_icon)
+            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['landscape_mode'], self.app_icon)
 
         self.__update_actions_state()
 

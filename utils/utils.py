@@ -16,7 +16,7 @@ def set_hotkeys_to_portrait_mode(orientation):
 
 def create_action(
     title: str,
-    icon: str,
+    icon: str = None,
     callback: callable = None,
     checkable: bool = False,
     is_enabled: bool = True,

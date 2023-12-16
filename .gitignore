@@ -21,3 +21,6 @@ meta.json
 scratches/
 *.zip
 *.qrc
+*.ui
+assets/icon.png
+*.spec
