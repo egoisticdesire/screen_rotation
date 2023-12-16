@@ -11,7 +11,6 @@ TITLES = {
     'portrait_mode': 'Portrait mode',
     'screen_rotation_locked': 'Screen rotation locked',
     'quit': 'Quit',
-    'logging': 'screen_rotation.log',
 }
 
 MESSAGES = {

@@ -2,7 +2,10 @@ import sys
 
 from PyQt6 import QtWidgets
 
+from utils.logger import Logger
 from widgets.system_tray_icon import SystemTrayIcon
+
+LOGGER = Logger(name=__name__)
 
 
 def main():
@@ -12,9 +15,9 @@ def main():
     tray_icon.show()
 
     try:
-        app.exec()
+        sys.exit(app.exec())
     except Exception as e:
-        print(f'[ERROR] {e}')
+        LOGGER.log_error(f'An error occurred while running the application: {e}')
 
 
 if __name__ == '__main__':

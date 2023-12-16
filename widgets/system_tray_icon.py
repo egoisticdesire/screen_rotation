@@ -6,9 +6,12 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 
 from utils import variables as var
 from utils.current_os_theme import get_windows_color_scheme
+from utils.logger import Logger
 from utils.themes import set_dark_theme, set_light_theme
 from utils.utils import create_action, set_hotkeys_to_landscape_mode, set_hotkeys_to_portrait_mode
 from widgets.rounded_menu import RoundedCornersQMenu
+
+LOGGER = Logger(name=__name__)
 
 
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
@@ -88,7 +91,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             # self.secondary_displays = rotatescreen.get_secondary_displays()
             # Обновите остальные данные или параметры, которые могли измениться
         except Exception as e:
-            print(f'An error occurred while refreshing primary display info: {e}')
+            LOGGER.log_error(f'An error occurred while refreshing the primary display information: {e}')
 
     def __check_os_theme(self):
         os_theme = get_windows_color_scheme()
@@ -116,19 +119,23 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.screen_rotation_locked.setIcon(QtGui.QIcon(self.icons['_screen_lock_rotation']))
 
     def __update_actions_state(self):
-        orientation = self.primary_display.current_orientation
+        try:
+            orientation = self.primary_display.current_orientation
 
-        if orientation == 0:
-            self.landscape_action.setChecked(True)
-            self.landscape_action.setEnabled(False)
-            self.portrait_action.setEnabled(True)
-            set_hotkeys_to_landscape_mode(self.__on_orientation_change_callback)
+            if orientation == 0:
+                self.landscape_action.setChecked(True)
+                self.landscape_action.setEnabled(False)
+                self.portrait_action.setEnabled(True)
+                set_hotkeys_to_landscape_mode(self.__on_orientation_change_callback)
 
-        elif orientation == 90:
-            self.portrait_action.setChecked(True)
-            self.portrait_action.setEnabled(False)
-            self.landscape_action.setEnabled(True)
-            set_hotkeys_to_portrait_mode(self.__on_orientation_change_callback)
+            elif orientation == 90:
+                self.portrait_action.setChecked(True)
+                self.portrait_action.setEnabled(False)
+                self.landscape_action.setEnabled(True)
+                set_hotkeys_to_portrait_mode(self.__on_orientation_change_callback)
+
+        except Exception as e:
+            LOGGER.log_error(f'An error occurred while updating actions state: {e}')
 
     def __lock_orientation(self):
         self.setIcon(QtGui.QIcon(self.icons['_screen_lock_rotation']))
@@ -160,17 +167,21 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
                 self.__lock_orientation()
 
     def __on_orientation_change_callback(self):
-        orientation = self.primary_display.current_orientation
+        try:
+            orientation = self.primary_display.current_orientation
 
-        if orientation == 0:
-            self.primary_display.set_portrait()
-            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['portrait_mode'], self.app_icon)
+            if orientation == 0:
+                self.primary_display.set_portrait()
+                # self.showMessage(var.MESSAGES['title'], var.MESSAGES['portrait_mode'], self.app_icon)
 
-        elif orientation == 90:
-            self.primary_display.set_landscape()
-            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['landscape_mode'], self.app_icon)
+            elif orientation == 90:
+                self.primary_display.set_landscape()
+                # self.showMessage(var.MESSAGES['title'], var.MESSAGES['landscape_mode'], self.app_icon)
 
-        self.__update_actions_state()
+            self.__update_actions_state()
+
+        except Exception as e:
+            LOGGER.log_error(f'An error occurred while changing the screen orientation: {e}')
 
     def __on_quit_callback(self):
         self.hide()
