@@ -10,6 +10,9 @@
 _Альбомный режим_: `Ctrl + Alt + ArrowUp`\
 _Портретный режим_: `Ctrl + Alt + ArrowDown`\
 \
+Добавление в автозагрузку (_временное решение_):\
+`Создать ярлык файла` > `Win + R` > `shell:startup` > `Переместить созданный ярлык`\
+\
 _Другие варианты подобных приложений, которые удалось найти в Интернете, имели разные недостатки для меня. Это стало поводом написать своё решение._
 
 ---
@@ -21,5 +24,8 @@ _Другие варианты подобных приложений, котор
 \
 _Landscape mode_: `Ctrl + Alt + ArrowUp`\
 _Portrait mode_: `Ctrl + Alt + ArrowDown`\
+\
+Adding to startup (_temporary solution_):\
+`Create a file shortcut` > `Win + R` > `shell:startup` > `Move the created shortcut`\
 \
 _Other versions of similar applications that I could find on the Internet had different disadvantages for me. This became the reason to write my decision._
