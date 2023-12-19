@@ -22,6 +22,9 @@ def set_dark_theme(radius: int):
         QMenu::item:pressed {{
             background-color: rgb(36, 36, 36);
         }}
+        QMenu::item:checked {{
+            background-color: rgb(46, 46, 46);
+        }}
         QMenu::item:disabled {{
             color: rgb(96, 96, 96);
             background-color: rgb(36, 36, 36);
@@ -54,9 +57,12 @@ def set_light_theme(radius: int):
         }}
         QMenu::item:selected {{
             background-color: rgb(213, 213, 213);
-        }}
         QMenu::item:pressed {{
             background-color: rgb(233, 233, 233);
+        }}
+        }}
+        QMenu::item:checked {{
+            background-color: rgb(213, 213, 213);
         }}
         QMenu::item:disabled {{
             color: rgb(136, 136, 136);

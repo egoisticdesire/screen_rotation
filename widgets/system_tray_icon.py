@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 import keyboard
 import rotatescreen
@@ -7,6 +8,7 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 from utils import variables as var
 from utils.current_os_theme import get_windows_color_scheme
 from utils.logger import Logger
+from utils.startup import Startup
 from utils.themes import set_dark_theme, set_light_theme
 from utils.utils import create_action, set_hotkeys_to_landscape_mode, set_hotkeys_to_portrait_mode
 from widgets.rounded_menu import RoundedCornersQMenu
@@ -17,9 +19,9 @@ LOGGER = Logger(name=__name__)
 class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.startup = Startup()
         self.is_locked = False
-        self.icons = var.ICONS
-        self.app_icon = QtGui.QIcon(self.icons['_screen_rotation'])
+        self.app_icon = QtGui.QIcon(var.ICONS['_screen_rotation'])
         self.setIcon(self.app_icon)
         self.setToolTip(var.TITLES['app'])
 
@@ -30,13 +32,14 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.menu = RoundedCornersQMenu()
         self.menu.setWindowFlags(QtCore.Qt.WindowType.Popup)
         self.menu.setAttribute(QtCore.Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.menu.setStyleSheet(self.__update_menu_theme())
 
         self.orientation_group = QtGui.QActionGroup(self)
         self.orientation_group.setExclusive(True)
 
         self.landscape_action = create_action(
             title=var.TITLES['landscape_mode'],
-            icon=self.icons['_screen_lock_landscape'],
+            icon=var.ICONS['_screen_landscape'],
             callback=self.__on_orientation_change_callback,
             set_shortcut=var.HOTKEY_LANDSCAPE_MODE,
             is_shortcut_visible=True,
@@ -44,22 +47,28 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         )
         self.portrait_action = create_action(
             title=var.TITLES['portrait_mode'],
-            icon=self.icons['_screen_lock_portrait'],
+            icon=var.ICONS['_screen_portrait'],
             callback=self.__on_orientation_change_callback,
             set_shortcut=var.HOTKEY_PORTRAIT_MODE,
             is_shortcut_visible=True,
             checkable=True,
         )
         self.screen_rotation_locked = create_action(
-            title=var.TITLES['screen_rotation_locked'],
-            icon=self.icons['_screen_lock_rotation'],
+            title=var.TITLES['screen_rotation_lock'],
+            icon=var.ICONS['_screen_lock_rotation'],
             is_enabled=False,
             is_visible=False,
         )
         self.quit_action = create_action(
             title=var.TITLES['quit'],
-            icon=self.icons['_quit'],
+            icon=var.ICONS['_quit'],
             callback=self.__on_quit_callback
+        )
+        self.startup_action = create_action(
+            title=var.TITLES['startup_add'],
+            icon=var.ICONS['_startup_add'],
+            callback=self.__manage_startup_state,
+            checkable=True,
         )
 
         self.orientation_group.addAction(self.landscape_action)
@@ -70,55 +79,58 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             self.portrait_action,
             self.screen_rotation_locked,
             self.menu.addSeparator(),
+            self.startup_action,
+            self.menu.addSeparator(),
             self.quit_action,
         ]
         self.menu.addActions(menu_actions)
         self.setContextMenu(self.menu)
 
-        self.__update_actions_state()
+        self.__update_action_states()
+        self.__update_startup_state()
 
         self.activated.connect(self.__on_tray_icon_activated_callback)
 
         # Создание таймера для отслеживания изменений
-        self.timer_change_theme = QtCore.QTimer(self)
-        self.timer_change_theme.timeout.connect(lambda: self.menu.setStyleSheet(self.__check_os_theme()))
-        self.timer_change_theme.timeout.connect(self.__refresh_primary_display_info)
-        self.timer_change_theme.start(1000)
+        self.updater = QtCore.QTimer(self)
+        self.updater.timeout.connect(lambda: self.menu.setStyleSheet(self.__update_menu_theme()))
+        self.updater.timeout.connect(self.__update_primary_display_info)
+        self.updater.timeout.connect(self.startup.update_registry_path)
+        self.updater.start(1000)
 
-    def __refresh_primary_display_info(self):
+    def __update_primary_display_info(self):
         try:
             self.primary_display = rotatescreen.get_primary_display()
             # self.secondary_displays = rotatescreen.get_secondary_displays()
-            # Обновите остальные данные или параметры, которые могли измениться
         except Exception as e:
-            LOGGER.log_error(f'An error occurred while refreshing the primary display information: {e}')
+            LOGGER.log_error(f'Error while updating primary display information: {e}')
 
-    def __check_os_theme(self):
+    def __update_menu_theme(self):
         os_theme = get_windows_color_scheme()
         new_stylesheet = set_dark_theme(self.menu.radius) if os_theme == 'dark_theme' else set_light_theme(self.menu.radius)
 
         # Проверка изменения темы и обновление иконки, если необходимо
         if os_theme != self.current_os_theme:
-            self.__update_icons()
+            self.__update_action_icons()
             self.current_os_theme = os_theme
 
         return new_stylesheet
 
-    def __update_icons(self):
-        for key in self.icons:
-            self.icons[key] = f':assets/{get_windows_color_scheme()}{key}.png'
+    def __update_action_icons(self):
+        for key in var.ICONS:
+            var.ICONS[key] = f':icons/{get_windows_color_scheme()}{key}.png'
 
-        if self.is_locked:
-            self.setIcon(QtGui.QIcon(self.icons['_screen_lock_rotation']))
-        else:
-            self.setIcon(QtGui.QIcon(self.icons['_screen_rotation']))
+        app_icon = var.ICONS['_screen_lock_rotation'] if self.is_locked else var.ICONS['_screen_rotation']
+        self.setIcon(QtGui.QIcon(app_icon))
+        startup_action_icon = var.ICONS['_startup_remove'] if self.startup_action.isChecked() else var.ICONS['_startup_add']
+        self.startup_action.setIcon(QtGui.QIcon(startup_action_icon))
 
-        self.landscape_action.setIcon(QtGui.QIcon(self.icons['_screen_lock_landscape']))
-        self.portrait_action.setIcon(QtGui.QIcon(self.icons['_screen_lock_portrait']))
-        self.quit_action.setIcon(QtGui.QIcon(self.icons['_quit']))
-        self.screen_rotation_locked.setIcon(QtGui.QIcon(self.icons['_screen_lock_rotation']))
+        self.landscape_action.setIcon(QtGui.QIcon(var.ICONS['_screen_landscape']))
+        self.portrait_action.setIcon(QtGui.QIcon(var.ICONS['_screen_portrait']))
+        self.quit_action.setIcon(QtGui.QIcon(var.ICONS['_quit']))
+        self.screen_rotation_locked.setIcon(QtGui.QIcon(var.ICONS['_screen_lock_rotation']))
 
-    def __update_actions_state(self):
+    def __update_action_states(self):
         try:
             orientation = self.primary_display.current_orientation
 
@@ -138,7 +150,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             LOGGER.log_error(f'An error occurred while updating actions state: {e}')
 
     def __lock_orientation(self):
-        self.setIcon(QtGui.QIcon(self.icons['_screen_lock_rotation']))
+        self.setIcon(QtGui.QIcon(var.ICONS['_screen_lock_rotation']))
         self.setToolTip(f"{var.TITLES['app']}{var.TITLES['app_lock']}")
 
         self.landscape_action.setVisible(False)
@@ -149,15 +161,39 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.is_locked = True
 
     def __unlock_orientation(self):
-        self.setIcon(QtGui.QIcon(self.icons['_screen_rotation']))
+        self.setIcon(QtGui.QIcon(var.ICONS['_screen_rotation']))
         self.setToolTip(var.TITLES['app'])
 
         self.landscape_action.setVisible(True)
         self.portrait_action.setVisible(True)
         self.screen_rotation_locked.setVisible(False)
 
-        self.__update_actions_state()
+        self.__update_action_states()
         self.is_locked = False
+
+    def __update_startup_state(self):
+        try:
+            actual_file_path = str(Path(sys.executable))
+            registry_path = self.startup.get_registry_path()
+
+            if registry_path and registry_path == actual_file_path:
+                self.startup_action.setChecked(True)
+                self.__manage_startup_state()
+
+        except Exception as e:
+            LOGGER.log_error(f'An error occurred while refreshing startup actions state: {e}')
+
+    def __manage_startup_state(self):
+        if self.startup_action.isChecked():
+            self.startup_action.setText(var.TITLES['startup_remove'])
+            self.startup_action.setIcon(QtGui.QIcon(var.ICONS['_startup_remove']))
+            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['startup_add'], self.app_icon)
+            self.startup.add_to_startup()
+        else:
+            self.startup_action.setText(var.TITLES['startup_add'])
+            self.startup_action.setIcon(QtGui.QIcon(var.ICONS['_startup_add']))
+            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['startup_remove'], self.app_icon)
+            self.startup.remove_from_startup()
 
     def __on_tray_icon_activated_callback(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
         if reason == self.ActivationReason.Trigger:
@@ -178,7 +214,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
                 self.primary_display.set_landscape()
                 # self.showMessage(var.MESSAGES['title'], var.MESSAGES['landscape_mode'], self.app_icon)
 
-            self.__update_actions_state()
+            self.__update_action_states()
 
         except Exception as e:
             LOGGER.log_error(f'An error occurred while changing the screen orientation: {e}')

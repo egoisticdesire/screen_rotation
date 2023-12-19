@@ -8,7 +8,7 @@ __pycache__/
 .idea/
 .vscode/
 *.log
-*version*
+metadata.txt
 .cached/
 *.cache
 .secret
@@ -22,5 +22,7 @@ scratches/
 *.zip
 *.qrc
 *.ui
-assets/icon.png
+*.png
+*.ttf
 *.spec
+metadata.py

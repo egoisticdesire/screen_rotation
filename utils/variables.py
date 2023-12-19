@@ -9,20 +9,30 @@ TITLES = {
     'app_lock': ' :: LOCKED',
     'landscape_mode': 'Landscape mode',
     'portrait_mode': 'Portrait mode',
-    'screen_rotation_locked': 'Screen rotation locked',
+    'screen_rotation_lock': 'Screen rotation locked',
     'quit': 'Quit',
+    'startup_add': 'Add to startup',
+    'startup_remove': 'Remove from startup',
 }
 
 MESSAGES = {
-    'title': 'Screen Orientation',
+    'title': 'Screen Rotation',
     'landscape_mode': 'Changed to Landscape mode',
     'portrait_mode': 'Changed to Portrait mode',
+    'startup_add': 'The application has been added to startup',
+    'startup_remove': 'The application has been removed from startup',
 }
 
 ICONS = {
-    '_screen_rotation': f':assets/{get_windows_color_scheme()}_screen_rotation.png',
-    '_screen_lock_rotation': f':assets/{get_windows_color_scheme()}_screen_lock_rotation.png',
-    '_screen_lock_landscape': f':assets/{get_windows_color_scheme()}_screen_lock_landscape.png',
-    '_screen_lock_portrait': f':assets/{get_windows_color_scheme()}_screen_lock_portrait.png',
-    '_quit': f':assets/{get_windows_color_scheme()}_quit.png',
+    '_screen_rotation': f':icons/{get_windows_color_scheme()}_screen_rotation.png',
+    '_screen_lock_rotation': f':icons/{get_windows_color_scheme()}_screen_lock_rotation.png',
+    '_screen_landscape': f':icons/{get_windows_color_scheme()}_screen_landscape.png',
+    '_screen_portrait': f':icons/{get_windows_color_scheme()}_screen_portrait.png',
+    '_quit': f':icons/{get_windows_color_scheme()}_quit.png',
+    '_startup_add': f':icons/{get_windows_color_scheme()}_startup_add.png',
+    '_startup_remove': f':icons/{get_windows_color_scheme()}_startup_remove.png',
+}
+
+FONTS = {
+    '_font': f':fonts/JetBrainsMonoRegular.ttf',
 }

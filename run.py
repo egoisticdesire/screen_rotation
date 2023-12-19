@@ -14,11 +14,13 @@ def main():
     tray_icon = SystemTrayIcon()
     tray_icon.show()
 
-    try:
-        sys.exit(app.exec())
-    except Exception as e:
-        LOGGER.log_error(f'An error occurred while running the application: {e}')
+    sys.exit(app.exec())
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except RuntimeError as e:
+        LOGGER.log_critical(f'An error occurred while running the application: {e}')
+    except Exception as e:
+        LOGGER.log_error(f'An error occurred while running the application: {e}')
