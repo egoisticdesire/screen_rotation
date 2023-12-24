@@ -9,7 +9,7 @@ from utils import variables as var
 from utils.current_os_theme import get_windows_color_scheme
 from utils.logger import Logger
 from utils.startup import Startup
-from utils.themes import set_dark_theme, set_light_theme
+from styles.tray_icon_themes import set_dark_theme, set_light_theme
 from utils.utils import create_action, set_hotkeys_to_landscape_mode, set_hotkeys_to_portrait_mode
 from widgets.rounded_menu import RoundedCornersQMenu
 
@@ -96,6 +96,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.updater.timeout.connect(lambda: self.menu.setStyleSheet(self.__update_menu_theme()))
         self.updater.timeout.connect(self.__update_primary_display_info)
         self.updater.timeout.connect(self.startup.update_registry_path)
+        self.updater.timeout.connect(self.__update_startup_state)
         self.updater.start(1000)
 
     def __update_primary_display_info(self):
@@ -184,16 +185,21 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             LOGGER.log_error(f'An error occurred while refreshing startup actions state: {e}')
 
     def __manage_startup_state(self):
+        registry_path = self.startup.get_registry_path()
+
         if self.startup_action.isChecked():
             self.startup_action.setText(var.TITLES['startup_remove'])
             self.startup_action.setIcon(QtGui.QIcon(var.ICONS['_startup_remove']))
             # self.showMessage(var.MESSAGES['title'], var.MESSAGES['startup_add'], self.app_icon)
-            self.startup.add_to_startup()
+            if not registry_path:
+                self.startup.add_to_startup()
+
         else:
             self.startup_action.setText(var.TITLES['startup_add'])
             self.startup_action.setIcon(QtGui.QIcon(var.ICONS['_startup_add']))
             # self.showMessage(var.MESSAGES['title'], var.MESSAGES['startup_remove'], self.app_icon)
-            self.startup.remove_from_startup()
+            if registry_path:
+                self.startup.remove_from_startup()
 
     def __on_tray_icon_activated_callback(self, reason: QtWidgets.QSystemTrayIcon.ActivationReason):
         if reason == self.ActivationReason.Trigger:
