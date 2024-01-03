@@ -4,6 +4,9 @@ from assets import resources
 HOTKEY_LANDSCAPE_MODE = 'ctrl+alt+up'
 HOTKEY_PORTRAIT_MODE = 'ctrl+alt+down'
 
+LOCALHOST = '127.0.0.1'
+PORT = 56565
+
 TITLES = {
     'app': 'Screen Rotation',
     'app_lock': ' :: LOCKED',
@@ -21,6 +24,7 @@ MESSAGES = {
     'portrait_mode': 'Changed to Portrait mode',
     'startup_add': 'The application has been added to startup',
     'startup_remove': 'The application has been removed from startup',
+    'already_running': 'The application is already running',
 }
 
 ICONS = {
@@ -34,5 +38,5 @@ ICONS = {
 }
 
 FONTS = {
-    '_font': f':fonts/JetBrainsMonoRegular.ttf',
+    '_font': ':fonts/JetBrainsMonoRegular.ttf',
 }

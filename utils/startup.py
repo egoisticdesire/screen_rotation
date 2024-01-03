@@ -11,7 +11,7 @@ class Startup:
             raise RuntimeError("This script is for Windows only")
 
         self.current_file_path = Path(sys.executable)
-        self.program_name = var.TITLES['app'].replace(' ', '')  # self.current_file_path.stem
+        self.program_name = var.TITLES['app'].replace(' ', '')
         self.program_path = str(self.current_file_path)
         self.key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
 
@@ -33,7 +33,7 @@ class Startup:
         except FileNotFoundError:
             pass
 
-    def get_registry_path(self):
+    def get_registry_path(self) -> str | None:
         try:
             key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, self.key_path, 0, winreg.KEY_READ)
             value, _ = winreg.QueryValueEx(key, self.program_name)

@@ -1,7 +1,9 @@
+import socket
 import sys
 
-from PyQt6 import QtWidgets
+from PyQt6 import QtGui, QtWidgets
 
+from utils import variables as var
 from utils.logger import Logger
 from widgets.system_tray_icon import SystemTrayIcon
 
@@ -14,7 +16,13 @@ def main():
     tray_icon = SystemTrayIcon()
     tray_icon.show()
 
-    sys.exit(app.exec())
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.bind((var.LOCALHOST, var.PORT))
+            sys.exit(app.exec())
+    except socket.error:
+        tray_icon.showMessage(None, var.MESSAGES['already_running'], QtGui.QIcon(var.ICONS['_screen_rotation']))
+        LOGGER.log_error(f'Port {var.PORT} is already in use')
 
 
 if __name__ == '__main__':
