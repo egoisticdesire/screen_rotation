@@ -10,7 +10,7 @@ from utils.current_os_theme import get_windows_color_scheme
 from utils.logger import Logger
 from utils.startup import Startup
 from styles.tray_icon_themes import set_dark_theme, set_light_theme
-from utils.utils import create_action, set_hotkeys_to_landscape_mode, set_hotkeys_to_portrait_mode
+from utils.utils import create_action, get_system_lang, set_hotkeys_to_landscape_mode, set_hotkeys_to_portrait_mode
 from widgets.rounded_menu import RoundedCornersQMenu
 
 LOGGER = Logger(name=__name__)
@@ -97,6 +97,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.updater.timeout.connect(self.__update_primary_display_info)
         self.updater.timeout.connect(self.startup.update_registry_path)
         self.updater.timeout.connect(self.__update_startup_state)
+        self.updater.timeout.connect(lambda: get_system_lang())
         self.updater.start(1000)
 
     def __update_primary_display_info(self):
@@ -214,11 +215,11 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
             if orientation == 0:
                 self.primary_display.set_portrait()
-                self.showMessage(None, var.PORTRAIT_MODE_MESSAGE, self.app_icon)
+                # self.showMessage(None, var.PORTRAIT_MODE_MESSAGE, self.app_icon)
 
             elif orientation == 90:
                 self.primary_display.set_landscape()
-                self.showMessage(None, var.LANDSCAPE_MODE_MESSAGE, self.app_icon)
+                # self.showMessage(None, var.LANDSCAPE_MODE_MESSAGE, self.app_icon)
 
             self.__update_action_states()
 
