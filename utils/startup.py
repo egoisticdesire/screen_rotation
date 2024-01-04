@@ -11,7 +11,7 @@ class Startup:
             raise RuntimeError("This script is for Windows only")
 
         self.current_file_path = Path(sys.executable)
-        self.program_name = var.TITLES['app'].replace(' ', '')
+        self.program_name = var.APP_TITLE.replace(' ', '')
         self.program_path = str(self.current_file_path)
         self.key_path = r"Software\Microsoft\Windows\CurrentVersion\Run"
 

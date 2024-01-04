@@ -23,7 +23,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.is_locked = False
         self.app_icon = QtGui.QIcon(var.ICONS['_screen_rotation'])
         self.setIcon(self.app_icon)
-        self.setToolTip(var.TITLES['app'])
+        self.setToolTip(var.APP_TITLE)
 
         self.current_os_theme = get_windows_color_scheme()
         self.primary_display = rotatescreen.get_primary_display()
@@ -38,7 +38,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         self.orientation_group.setExclusive(True)
 
         self.landscape_action = create_action(
-            title=var.TITLES['landscape_mode'],
+            title=var.LANDSCAPE_MODE_TITLE,
             icon=var.ICONS['_screen_landscape'],
             callback=self.__on_orientation_change_callback,
             set_shortcut=var.HOTKEY_LANDSCAPE_MODE,
@@ -46,7 +46,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             checkable=True,
         )
         self.portrait_action = create_action(
-            title=var.TITLES['portrait_mode'],
+            title=var.PORTRAIT_MODE_TITLE,
             icon=var.ICONS['_screen_portrait'],
             callback=self.__on_orientation_change_callback,
             set_shortcut=var.HOTKEY_PORTRAIT_MODE,
@@ -54,18 +54,18 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
             checkable=True,
         )
         self.screen_rotation_locked = create_action(
-            title=var.TITLES['screen_rotation_lock'],
+            title=var.SCREEN_ROTATION_LOCK_TITLE,
             icon=var.ICONS['_screen_lock_rotation'],
             is_enabled=False,
             is_visible=False,
         )
         self.quit_action = create_action(
-            title=var.TITLES['quit'],
+            title=var.QUIT_TITLE,
             icon=var.ICONS['_quit'],
             callback=self.__on_quit_callback
         )
         self.startup_action = create_action(
-            title=var.TITLES['startup_add'],
+            title=var.STARTUP_ADD_TITLE,
             icon=var.ICONS['_startup_add'],
             callback=self.__manage_startup_state,
             checkable=True,
@@ -152,7 +152,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
     def __lock_orientation(self):
         self.setIcon(QtGui.QIcon(var.ICONS['_screen_lock_rotation']))
-        self.setToolTip(f"{var.TITLES['app']}{var.TITLES['app_lock']}")
+        self.setToolTip(f"{var.APP_TITLE}{var.APP_LOCK_TITLE}")
 
         self.landscape_action.setVisible(False)
         self.portrait_action.setVisible(False)
@@ -163,7 +163,7 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
     def __unlock_orientation(self):
         self.setIcon(QtGui.QIcon(var.ICONS['_screen_rotation']))
-        self.setToolTip(var.TITLES['app'])
+        self.setToolTip(var.APP_TITLE)
 
         self.landscape_action.setVisible(True)
         self.portrait_action.setVisible(True)
@@ -188,16 +188,16 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
         registry_path = self.startup.get_registry_path()
 
         if self.startup_action.isChecked():
-            self.startup_action.setText(var.TITLES['startup_remove'])
+            self.startup_action.setText(var.STARTUP_REMOVE_TITLE)
             self.startup_action.setIcon(QtGui.QIcon(var.ICONS['_startup_remove']))
-            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['startup_add'], self.app_icon)
+            # self.showMessage(None, var.STARTUP_ADDED_MESSAGE, self.app_icon)
             if not registry_path:
                 self.startup.add_to_startup()
 
         else:
-            self.startup_action.setText(var.TITLES['startup_add'])
+            self.startup_action.setText(var.STARTUP_ADD_TITLE)
             self.startup_action.setIcon(QtGui.QIcon(var.ICONS['_startup_add']))
-            # self.showMessage(var.MESSAGES['title'], var.MESSAGES['startup_remove'], self.app_icon)
+            # self.showMessage(None, var.STARTUP_REMOVED_MESSAGE, self.app_icon)
             if registry_path:
                 self.startup.remove_from_startup()
 
@@ -214,11 +214,11 @@ class SystemTrayIcon(QtWidgets.QSystemTrayIcon):
 
             if orientation == 0:
                 self.primary_display.set_portrait()
-                # self.showMessage(var.MESSAGES['title'], var.MESSAGES['portrait_mode'], self.app_icon)
+                self.showMessage(None, var.PORTRAIT_MODE_MESSAGE, self.app_icon)
 
             elif orientation == 90:
                 self.primary_display.set_landscape()
-                # self.showMessage(var.MESSAGES['title'], var.MESSAGES['landscape_mode'], self.app_icon)
+                self.showMessage(None, var.LANDSCAPE_MODE_MESSAGE, self.app_icon)
 
             self.__update_action_states()
 

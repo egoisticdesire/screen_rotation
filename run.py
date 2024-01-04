@@ -21,7 +21,8 @@ def main():
             sock.bind((var.LOCALHOST, var.PORT))
             sys.exit(app.exec())
     except socket.error:
-        tray_icon.showMessage(None, var.MESSAGES['already_running'], QtGui.QIcon(var.ICONS['_screen_rotation']))
+        tray_icon.showMessage(None, var.APP_ALREADY_RUNNING_MESSAGE, QtGui.QIcon(var.ICONS['_screen_rotation']))
+        print(var.ICONS['_screen_rotation'])
         LOGGER.log_error(f'Port {var.PORT} is already in use')
 
 

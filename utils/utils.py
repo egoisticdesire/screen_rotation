@@ -1,3 +1,5 @@
+import winreg
+
 import keyboard
 from PyQt6 import QtGui
 
@@ -47,3 +49,18 @@ def create_action(
         return action
     except Exception as e:
         LOGGER.log_error(f'An error occurred while creating action: {e}')
+
+
+def get_system_lang() -> str:
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, 'Control Panel\\Desktop') as key:
+            value, _ = winreg.QueryValueEx(key, 'PreferredUILanguages')
+            return value[0]
+    except Exception as e:
+        LOGGER.log_error(f'An error occurred while getting system language: {e}')
+
+
+def get_text(data, text_key, lang='en'):
+    if lang in data.get(text_key, {}):
+        return data[text_key][lang]
+    return data[text_key]['en']
